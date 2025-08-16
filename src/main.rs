@@ -21,6 +21,7 @@ fn panic(info: &core::panic::PanicInfo) -> ! {
 extern crate alloc;
 
 pub mod constants;
+pub mod config;
 pub mod abstractions;
 pub mod dtos;
 pub mod enums;

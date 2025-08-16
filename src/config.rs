@@ -1,4 +1,4 @@
-use dotenv::dotenv;
+use alloc::string::{String, ToString};
 
 #[derive(Debug, Clone)]
 pub struct Config {
@@ -12,13 +12,12 @@ pub struct Config {
 impl Config {
 
     pub fn new() -> Self {
-        dotenv().ok();
         Self {
-            device_urn: env::var("DEVICE_URN").expect("DEVICE_URN must be set."),
-            location_urn: env::var("LOCATION_URN").expect("LOCATION_URN must be set."),
-            wifi_ssid: env::var("WIFI_SSID").expect("WIFI_SSID must be set."),
-            wifi_password: env::var("WIFI_PASSWORD").expect("WIFI_PASSWORD must be set."),
-            server_base_url: env::var("SEVER_BASE_URL").expect("SEVER_BASE_URL must be set.")
+            device_urn: option_env!("DEVICE_URN").expect("DEVICE_URN must be set").to_string(),
+            location_urn: option_env!("LOCATION_URN").expect("LOCATION_URN must be set").to_string(),
+            wifi_ssid: option_env!("WIFI_SSID").expect("WIFI_SSID must be set").to_string(),
+            wifi_password: option_env!("WIFI_PASSWORD").expect("WIFI_PASSWORD must be set").to_string(),
+            server_base_url: option_env!("SEVER_BASE_URL").expect("SEVER_BASE_URL must be set").to_string()
         }
     }
 }

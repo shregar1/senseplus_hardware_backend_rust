@@ -3,6 +3,12 @@ runner = "espflash flash --monitor --chip esp32"
 
 [env]
 ESP_LOG="info"
+WIFI_SSID = "MyWiFi"
+WIFI_PASSWORD = "MyPass123"
+DEVICE_URN = "abc"
+LOCATION_URN = "abc"
+SENSOR_INTERVAL = "1000"
+# SEVER_BASE_URL = null
 
 [build]
 rustflags = [
