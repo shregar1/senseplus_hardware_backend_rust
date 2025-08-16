@@ -11,16 +11,16 @@ use esp_idf_svc::log::EspLogger;
 
 use crate::config::Config as DeviceConfig;
 
-mod abstractions;
-mod config;
-mod configurations;
-mod constants;
-mod dtos;
-mod factories;
-mod pipelines;
-mod sensors;
-mod services;
-mod utilities;
+// mod abstractions;
+// mod config;
+// mod configurations;
+// mod constants;
+// mod dtos;
+// mod factories;
+// mod pipelines;
+// mod sensors;
+// mod services;
+// mod utilities;
 
 fn main() -> Result<()> {
     // Required for ESP-IDF patches (startup)
