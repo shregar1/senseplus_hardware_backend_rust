@@ -1,8 +1,14 @@
-use serde_json::Value;
+use alloc::collections::BTreeMap;
+use alloc::string::String;
+use alloc::boxed::Box;
+use core::error::Error;
 
-pub trait IPipeline {
+use crate::abstractions::sensor::ISensor;
+use crate::enums::value::Value;
+
+pub trait IPipeline<T> {
     fn urn(&self) -> String;
     fn device_urn(&self) -> String;
     fn location_urn(&self) -> String;
-    fn execute(&self) -> Result<Value, Error>;
+    fn run(&self, sensor: &dyn ISensor<T>) -> Result<BTreeMap<String, Value>, Box<dyn Error + Send + Sync>>;
 }

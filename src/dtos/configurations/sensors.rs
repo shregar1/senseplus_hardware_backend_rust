@@ -1,6 +1,7 @@
-use serde::Deserialize;
+use alloc::string::String;
+use alloc::vec::Vec;
 
-#[derive(Debug, Deserialize, Clone)]
+#[derive(Debug, Clone)]
 pub struct SensorsConfigDTO {
     pub include: Vec<String>,
 }

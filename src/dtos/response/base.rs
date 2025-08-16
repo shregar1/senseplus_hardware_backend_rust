@@ -1,8 +1,8 @@
-use serde::{Deserialize, Serialize};
-use serde_json::{Map, Value};
+use alloc::string::String;
 
-#[derive(Debug, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
+use crate::enums::value::Value;
+
+#[derive(Debug)]
 pub struct BaseResponseDTO {
     pub status: String,
     pub message: String,

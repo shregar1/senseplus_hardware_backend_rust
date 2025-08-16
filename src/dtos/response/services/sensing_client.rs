@@ -1,7 +1,7 @@
-use serde::Deserialize;
-use serde_json::Value;
+use alloc::collections::BTreeMap;
+use alloc::string::String;
 
-#[derive(Debug, Deserialize, Clone, Copy)]
+#[derive(Debug, Clone)]
 pub struct SensingClientServiceResponseDTO {
-    pub data: Value,
+    pub data: BTreeMap<String, String>,
 }

@@ -1,6 +1,4 @@
-use serde::{Deserialize, Serialize};
-
-#[derive(Default, Debug, Deserialize, Serialize)]
+#[derive(Default, Debug)]
 pub struct LSM303DLHCACCELSensorMeasurement {
     pub x: f32,
     pub y: f32,

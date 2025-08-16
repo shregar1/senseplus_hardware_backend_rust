@@ -1,6 +1,6 @@
-use serde::{Deserialize, Serialize};
+use alloc::string::String;
 
-#[derive(Default, Debug, Deserialize, Serialize)]
+#[derive(Default, Debug)]
 pub struct VL53L0XSensorMeasurement {
     pub distance_mm: f32,
     pub status: String

@@ -1,6 +1,6 @@
-use std::collections::HashMap;
-
-use serde_json::{json, Value};
+use alloc::collections::BTreeMap;
+use alloc::string::String;
+use alloc::vec::Vec;
 
 use crate::abstractions::factory::IFactory;
 use crate::abstractions::sensor::ISensor;
@@ -9,41 +9,40 @@ use crate::dtos::configurations::sensors::SensorsConfigDTO;
 use crate::dtos::response::services::sensing_client::SensingClientServiceResponseDTO;
 use crate::factories::sensor::SensorFactory;
 
-
-struct SensingClientService {
+pub struct SensingClientService {
     pub urn: String,
     pub device_urn: String,
     pub location_urn: String,
     pub config: SensorsConfigDTO
 }
 
-impl IService for SensingClientService  {
+impl IService<SensorsConfigDTO> for SensingClientService  {
 
     fn urn(&self) -> String {
-        &self.urn
+        self.urn.clone()
     }
 
     fn device_urn(&self) -> String {
-        &self.device_urn
+        self.device_urn.clone()
     }
 
     fn location_urn(&self) -> String {
-        &self.location_urn
+        self.location_urn.clone()
     }
 
-    async fn run(&self, config: SensorsConfigDTO) -> Result<Value, Error> {
-        self._run().await
+    fn run(&self) -> Result<SensingClientServiceResponseDTO, Box<dyn core::error::Error + Send + Sync>> {
+        self._run()
     }
     
 }
 
 impl SensingClientService {
 
-    fn config(&self) -> SensorsConfigDTO {
+    fn config(&self) -> &SensorsConfigDTO {
         &self.config
     }
 
-    fn new(
+    pub fn new(
         urn: String,
         device_urn: String,
         location_urn: String,
@@ -57,27 +56,27 @@ impl SensingClientService {
         }
     }
 
-    async fn _run(&self) -> HashMap<String, Value> {
+    fn _run(&self) -> Result<SensingClientServiceResponseDTO, Box<dyn core::error::Error + Send + Sync>> {
 
-        let include_sensors: Vec<String> = self.config.include;
-        let sensor_factory: SensorFactory<dyn ISensor<_>> = SensorFactory::new(
-            self.urn,
-            self.device_urn,
-            self.location_urn
+        let include_sensors: Vec<String> = self.config.include.clone();
+        let sensor_factory: SensorFactory = SensorFactory::new(
+            self.urn.clone(),
+            self.device_urn.clone(),
+            self.location_urn.clone()
         );
 
-        let mut data: HashMap<String: Value> = HashMap::new();
+        let mut data: BTreeMap<String, String> = BTreeMap::new();
         for sensor_key in include_sensors {
-            let sensor: dyn ISensor<_> = sensor_factory.get(sensor_key.to_lowercase()).await.unwrap();
-            let sensor_measurements = match sensor.read(){
+            let sensor = sensor_factory.get(sensor_key.to_lowercase())?;
+            let sensor_measurements = match sensor.read_sync(){
                 Ok(data) => {
-                    data
+                    format!("{:?}", data)
                 },
                 Err(e) => {
-                    Err(e)
+                    return Err(e);
                 }
-            }.await;
-            data.entry(sensor_key.to_uppercase()).or_insert_with(json!(sensor_measurements))
+            };
+            data.insert(sensor_key.to_uppercase(), sensor_measurements);
         }
         Ok(
             SensingClientServiceResponseDTO {

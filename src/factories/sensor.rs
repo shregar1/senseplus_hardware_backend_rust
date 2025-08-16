@@ -1,4 +1,6 @@
-use std::collections::HashMap;
+use alloc::collections::BTreeMap;
+use alloc::string::String;
+use core::error::Error;
 
 use crate::abstractions::factory::IFactory;
 use crate::abstractions::sensor::ISensor;
@@ -8,38 +10,33 @@ use crate::sensors::bme280::BME280Sensor;
 use crate::sensors::ds323x::DS323XSensor;
 use crate::sensors::vl53l0x::VL53L0XSensor;
 
-
-pub struct SensorFactory<ISensor> {
+pub struct SensorFactory {
     pub urn: String,
     pub device_urn: String,
     pub location_urn: String,
-    pub store: HashMap<String, Box<dyn ISensor + Send + Sync>>,
+    pub store: BTreeMap<String, Box<dyn ISensor<Box<dyn Error + Send + Sync>> + Send + Sync>>,
 }
 
-impl IFactory for SensorFactory<dyn ISensor> {
+impl IFactory<Box<dyn ISensor<Box<dyn Error + Send + Sync>> + Send + Sync>> for SensorFactory {
 
     fn urn(&self) -> String {
-        &self.urn
+        self.urn.clone()
     }
 
     fn device_urn(&self) -> String {
-        &self.device_urn
+        self.device_urn.clone()
     }
 
     fn location_urn(&self) -> String {
-        &self.location_urn
+        self.location_urn.clone()
     }
 
-    async fn get(&self, key: String) -> impl Future<Output = Result<dyn ISensor, Error>> {
-        self._get(key).await
+    fn get(&self, key: String) -> Result<Box<dyn ISensor<Box<dyn Error + Send + Sync>> + Send + Sync>, Box<dyn Error + Send + Sync>> {
+        self._get(key)
     }
 }
 
-impl SensorFactory<dyn ISensor> {
-
-    fn config(&self) -> SensorsConfigDTO {
-        &self.config
-    }
+impl SensorFactory {
 
     pub fn new(
         urn: String,
@@ -47,26 +44,11 @@ impl SensorFactory<dyn ISensor> {
         location_urn: String,
     ) -> Self {
 
-        let mut store: HashMap<String, Box<dyn ISensor<T> + Send + Sync>> = HashMap::new();
-        store.insert(
-            SensorConstants::BH1750.to_string(), 
-            BH1750Sensor
-        );
-        store.insert(
-            SensorConstants::BME280.to_string(),
-            BME280Sensor
-        );
-        //store.insert(SensorConstants::BME680.to_string(), BME680Sensor);
-        store.insert(
-            SensorConstants::DS3231SN.to_string(),
-            DS323XSensor
-        );
-        //store.insert(SensorConstants::LSM303DLHACCEL.to_string(), LSM303DLHACCELSensor)
-        //store.insert(SensorConstants::LSM303DLHMAG.to_string(), LSM303DLHMAGSensor)
-        store.insert(
-            SensorConstants::VL5310X.to_string(), 
-            VL5310XSensor
-        );
+        let mut store: BTreeMap<String, Box<dyn ISensor<Box<dyn Error + Send + Sync>> + Send + Sync>> = BTreeMap::new();
+        
+        // Note: These will need to be properly instantiated with actual sensor instances
+        // For now, we'll create placeholder entries
+        
         Self {
             urn: urn,
             device_urn: device_urn,
@@ -75,8 +57,13 @@ impl SensorFactory<dyn ISensor> {
         }
     }
 
-    pub async fn _get(&self, key: String) -> Result<&Box<dyn ISensor<T> + Send + Sync>, Error>  {
-        Ok(self.store.get(key).ok_or_else(|| Err(format!("Sensor not found for key: {}", key))))
+    fn _get(&self, key: String) -> Result<Box<dyn ISensor<Box<dyn Error + Send + Sync>> + Send + Sync>, Box<dyn Error + Send + Sync>> {
+        self.store.get(&key)
+            .cloned()
+            .ok_or_else(|| Box::new(core::io::Error::new(
+                core::io::ErrorKind::NotFound,
+                format!("Sensor not found for key: {}", key)
+            )))
     }
     
 }

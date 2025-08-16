@@ -1,4 +1,4 @@
-pub struct SensorConstants;
+pub struct SensorConstant;
 
 impl SensorConstant {
     pub const BH1750: &'static str = "bh1750";
