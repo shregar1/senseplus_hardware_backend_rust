@@ -54,6 +54,10 @@ cargo check
 ### **Building & Flashing**
 ```bash
 # Build the project
+. /Users/shreyansh/Documents/esp-idf/export.sh
+or
+. /Users/shreyansh/export-esp.sh
+
 cargo build
 
 # Flash to ESP32
