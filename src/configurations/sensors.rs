@@ -1,19 +1,18 @@
-use once_cell::sync::OnceCell;
-use serde::Deserialize;
-use std::fs::File;
-use std::io::BufReader;
+use alloc::string::{String, ToString};
+use alloc::{vec::Vec, vec};
 
-use crate::dtos::configurations::sensors::SensorsConfigDTO;
+pub struct SensorsConfig {
+    pub include: Vec<String>,
+}
 
-const CONFIG_PATH: &str = "src/configs/sensors/config.json";
-static CONFIG: OnceCell<SensorsConfigDTO> = OnceCell::new();
-
-pub fn get_config() -> &'static SensorsConfigDTO {
-    OnceCell.get_or_init(|| {
-        let file: File = File::open(CONFIG_PATH).expect(&format!("Failed to open {} config file", CONFIG_PATH));
-        let reader: BufReader<File> = BufReader::new(file);
-        let config = serde_json::from_reader(reader)
-            .expect(&format!("Failed to parse {} config JSON", CONFIG_PATH));
-        config
-    })
+impl SensorsConfig {
+    pub fn new() -> Self {
+        let include = vec![
+            "bme280".to_string(),
+            "bh1750".to_string()
+        ];
+        Self { 
+            include: include
+        }
+    }
 }

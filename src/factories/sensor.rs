@@ -1,10 +1,10 @@
 use alloc::collections::BTreeMap;
-use alloc::string::String;
+use alloc::string::{String, ToString};
 use core::error::Error;
 
 use crate::abstractions::factory::IFactory;
 use crate::abstractions::sensor::ISensor;
-use crate::constants::sensor::SensorConstants;
+use crate::constants::sensor::SensorConstant;
 use crate::sensors::bh1750::BH1750Sensor;
 use crate::sensors::bme280::BME280Sensor;
 use crate::sensors::ds323x::DS323XSensor;
@@ -46,8 +46,10 @@ impl SensorFactory {
 
         let mut store: BTreeMap<String, Box<dyn ISensor<Box<dyn Error + Send + Sync>> + Send + Sync>> = BTreeMap::new();
         
-        // Note: These will need to be properly instantiated with actual sensor instances
-        // For now, we'll create placeholder entries
+        store.insert(SensorConstant::BME280.to_string(), Box::new(BME280Sensor::new()));
+        store.insert(SensorConstant::BH1750.to_string(), Box::new(BH1750Sensor::new()));
+        store.insert(SensorConstant::DS3231SN.to_string(), Box::new(DS323XSensor::new()));
+        store.insert(SensorConstant::VL5310X.to_string(), Box::new(VL53L0XSensor::new()));
         
         Self {
             urn: urn,

@@ -1,23 +1,27 @@
-use bme280::{BME280, Measurements};
-use esp_idf_hal::{
+use alloc::string::{String};
+use alloc::boxed::Box;
+use core::fmt::Error;
+
+use bme280::{BME280};
+use esp_hal::{
     delay::Delay,
     i2c::{I2cConfig, I2cDriver},
     peripherals::Peripherals,
 };
 
-use crate::dtos::measurement::{self, sensor::bme280::BME280SensorMeasurement};
+use crate::dtos::measurement::{sensor::bme280::BME280SensorMeasurement};
 
 use crate::abstractions::sensor::ISensor;
 
-struct BME280Sensor {
+pub struct BME280Sensor {
     urn: String,
     device_urn: String,
     location_urn: String,
     name: String,
-    sensor: BME280,
+    sensor: BME280<I2cDriver, Delay>,
 }
 
-impl ISensor<BME280SensorMeasurement> for BME280Sersor {
+impl ISensor<BME280SensorMeasurement> for BME280Sensor {
     fn urn(&self) -> String {
         self.urn.clone()
     }
@@ -34,8 +38,8 @@ impl ISensor<BME280SensorMeasurement> for BME280Sersor {
         self.name.clone()
     }
 
-    async fn read(&self) -> Result<BME280SensorMeasurement, Error> {
-        self._read().await
+    fn read(&self) -> Result<BME280SensorMeasurement, Error> {
+        self._read()
     }
 
 }
@@ -51,7 +55,7 @@ impl BME280Sensor {
         let sda = peripherals.pins.gpio21;
         let scl = peripherals.pins.gpio22;
 
-        let config = I2cConfig::new().baudrate(400.kHz().into());
+        let config = I2cConfig::new().baudrate(400_000.into());
         let i2c = I2cDriver::new(
             peripherals.i2c0,
             sda,
@@ -61,7 +65,7 @@ impl BME280Sensor {
 
         let delay: Delay = Delay::new();
 
-        let mut sensor: BME280 = BME280::new_primary(
+        let mut sensor: BME280<I2cDriver, Delay> = BME280::new_primary(
             i2c,
             delay,
         );
@@ -76,21 +80,21 @@ impl BME280Sensor {
         }
     }
 
-    pub async fn _read(&self) -> Result<BME280SensorMeasurement, Error> {
+    pub fn _read(&self) -> Result<BME280SensorMeasurement, Error> {
         let measurement: BME280SensorMeasurement = match self.sensor.measure(){
             Ok(measurements) => {
                 BME280SensorMeasurement { 
                     temperature: measurements.temperature,
                     humidity: measurements.humidity,
                     pressure: measurements.pressure 
-                };
+                }
             },
             Err(e) => {
                 BME280SensorMeasurement { 
-                    temperature: nil,
-                    humidity: nil,
-                    pressure: nil 
-                };
+                    temperature: 0.0,
+                    humidity: 0.0,
+                    pressure: 0.0 
+                }
             }
         };
         Ok(measurement)

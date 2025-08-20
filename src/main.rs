@@ -20,12 +20,17 @@ fn panic(info: &core::panic::PanicInfo) -> ! {
 
 extern crate alloc;
 
-pub mod constants;
-pub mod config;
 pub mod abstractions;
+pub mod config;
+pub mod configurations;
+pub mod constants;
 pub mod dtos;
 pub mod enums;
+pub mod factories;
+pub mod pipelines;
+pub mod  sensors;
 pub mod services;
+pub mod utilities;
 
 // This creates a default app-descriptor required by the esp-idf bootloader.
 // For more information see: <https://docs.espressif.com/projects/esp-idf/en/stable/esp32/api-reference/system/app_image_format.html#application-description>
